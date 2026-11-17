@@ -1,0 +1,98 @@
+name: Build Android APK
+
+# Builds an installable APK that opens your live website (same Firebase backend and database).
+# Set the repository variable SITE_URL (Settings > Secrets and variables > Actions > Variables)
+# to your live https address, for example https://your-project.web.app, or type it when you run this.
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: 'Live https address of the website (leave empty to use the SITE_URL variable)'
+        required: false
+        type: string
+      version_code:
+        description: 'Android versionCode (increase it for every new release)'
+        required: false
+        default: '1'
+        type: string
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ inputs.site_url || vars.SITE_URL }}
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the website address
+        run: |
+          if [[ ! "$SITE_URL" =~ ^https://[A-Za-z0-9.-]+(/.*)?$ ]]; then
+            echo "::error::SITE_URL is missing or not an https address. Set the SITE_URL variable or type it in when running the workflow."
+            exit 1
+          fi
+          echo "Building the app for $SITE_URL"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Prepare the signing key
+        run: |
+          if [ "$HAS_KEYSTORE" = "true" ]; then
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "KS_PASS=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "KS_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "KEY_PASS=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No permanent signing key found. Making a temporary one for this build. It works for testing, but see ANDROID.md to add a permanent key."
+            keytool -genkeypair -keystore "$RUNNER_TEMP/release.jks" -storepass temp-build-key -keypass temp-build-key \
+              -alias temp -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Starlink Hypercore Finance, O=Starlink Hypercore Finance, C=UG"
+            echo "KS_PASS=temp-build-key" >> "$GITHUB_ENV"
+            echo "KS_ALIAS=temp" >> "$GITHUB_ENV"
+            echo "KEY_PASS=temp-build-key" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build the release APK
+        working-directory: android
+        run: >
+          gradle assembleRelease --no-daemon
+          -PSITE_URL="$SITE_URL"
+          -PVERSION_CODE="${{ inputs.version_code || '1' }}"
+          -PKEYSTORE_PATH="$RUNNER_TEMP/release.jks"
+          -PKEYSTORE_PASSWORD="$KS_PASS"
+          -PKEY_ALIAS="$KS_ALIAS"
+          -PKEY_PASSWORD="$KEY_PASS"
+
+      - name: Name the APK and read its signing fingerprint
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk dist/StarlinkHypercoreFinance.apk
+          FP=$(keytool -list -v -keystore "$RUNNER_TEMP/release.jks" -storepass "$KS_PASS" -alias "$KS_ALIAS" | grep 'SHA256:' | head -1 | sed 's/.*SHA256: //')
+          {
+            echo "## Android APK built"
+            echo ""
+            echo "Website: $SITE_URL"
+            echo "Package: ug.co.starlinkhypercore.finance"
+            echo ""
+            echo "Signing fingerprint (SHA-256), needed in .well-known/assetlinks.json:"
+            echo ""
+            echo '```'
+            echo "$FP"
+            echo '```'
+            [ "$HAS_KEYSTORE" = "true" ] || echo "**Temporary key used.** Fingerprint changes on every build. Follow ANDROID.md to add a permanent key."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: StarlinkHypercoreFinance-apk
+          path: dist/StarlinkHypercoreFinance.apk
+          if-no-files-found: error
+          retention-days: 30

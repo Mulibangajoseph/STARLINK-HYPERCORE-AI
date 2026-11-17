@@ -1,0 +1,56 @@
+name: Deploy website to Firebase
+
+# Publishes the website (the same site the Android app opens) plus the Firestore and Storage rules.
+# One-time setup (details in SETUP.md):
+#   Variable  FIREBASE_PROJECT_ID           your Firebase project id
+#   Secret    FIREBASE_SERVICE_ACCOUNT      the full JSON of a service account with "Firebase Admin" access
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT: ${{ vars.FIREBASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check settings
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          [ -n "$PROJECT" ] || { echo "::error::Set the FIREBASE_PROJECT_ID variable."; exit 1; }
+          [ -n "$SA" ] || { echo "::error::Set the FIREBASE_SERVICE_ACCOUNT secret."; exit 1; }
+          if grep -q "YOUR_API_KEY" firebase-config.js; then
+            echo "::error::firebase-config.js still has placeholder values. Paste your Firebase web app config first (SETUP.md step 1)."; exit 1
+          fi
+
+      - name: Run the unit tests
+        run: node --test tests/loan-calc.test.mjs
+
+      - name: Deploy hosting and Firestore rules
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@latest deploy --only hosting,firestore:rules --project "$PROJECT" --non-interactive
+
+      - name: Deploy Storage rules (needs Storage enabled in the console)
+        continue-on-error: true
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@latest deploy --only storage --project "$PROJECT" --non-interactive
+
+      - name: Show the live addresses
+        run: |
+          {
+            echo "## Deployed"
+            echo ""
+            echo "Website: https://$PROJECT.web.app"
+            echo "Staff portal: https://$PROJECT.web.app/admin.html"
+          } >> "$GITHUB_STEP_SUMMARY"

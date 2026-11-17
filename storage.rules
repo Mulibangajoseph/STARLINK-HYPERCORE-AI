@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // National ID images. Path: loan-ids/{customerUid}/{applicationId}/front.jpg or back.jpg
+    match /loan-ids/{uid}/{appId}/{file} {
+      // A verified customer can upload each image once, only into their own folder. They cannot read, replace or delete it.
+      allow create: if request.auth != null
+        && request.auth.token.email_verified == true
+        && 'phone_number' in request.auth.token
+        && request.auth.uid == uid
+        && file in ['front.jpg', 'back.jpg']
+        && request.resource.contentType == 'image/jpeg'
+        && request.resource.size > 1024 && request.resource.size < 5 * 1024 * 1024;
+
+      // Only listed staff can read ID images.
+      allow read: if request.auth != null
+        && request.auth.token.email_verified == true
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+
+      allow update, delete: if false;
+    }
+
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

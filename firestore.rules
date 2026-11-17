@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in user with a verified email can read and add only their own demo ledger records.
+    match /users/{uid}/ledger/{entry} {
+      allow read: if request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true;
+      allow create: if request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true
+        && request.resource.data.keys().hasOnly(['t', 'a', 'n', 'd'])
+        && request.resource.data.t in ['in', 'out']
+        && request.resource.data.a is int && request.resource.data.a > 0 && request.resource.data.a <= 1000000000
+        && request.resource.data.n is string && request.resource.data.n.size() <= 40
+        && request.resource.data.d is number;
+      allow update, delete: if false;
+    }
+    // ---------------------------------------------------------------------------------------------
+    // LOAN APPLICATIONS AND STAFF PORTAL
+    // National ID details are required ONLY here. Ordinary registration never touches these paths.
+    // ---------------------------------------------------------------------------------------------
+    function verified() { return request.auth != null && request.auth.token.email_verified == true; }
+    // A phone number linked by SMS code (OTP) puts phone_number in the sign-in token.
+    function phoneVerified() { return verified() && 'phone_number' in request.auth.token && request.auth.token.phone_number.size() >= 9; }
+    function staffDoc() { return get(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function isStaff() {
+      return verified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && staffDoc().data.role in ['officer', 'manager'];
+    }
+    function isManager() { return isStaff() && staffDoc().data.role == 'manager'; }
+
+    // Staff accounts are created by hand in the Firebase console. Nobody can write here from the app.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /loanApplications/{id} {
+      allow read: if isStaff() || (verified() && resource.data.uid == request.auth.uid);
+
+      // A customer can only CREATE an application, and only as "submitted". Customers can never approve,
+      // edit or delete. There is no automatic approval anywhere.
+      allow create: if phoneVerified()
+        && request.resource.data.keys().hasOnly(['uid', 'status', 'fullName', 'dob', 'phone', 'employment', 'amount',
+             'months', 'purpose', 'ninLast4', 'docs', 'consent', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() >= 3 && request.resource.data.fullName.size() <= 100
+        && request.resource.data.dob is string && request.resource.data.dob.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.phone is string && request.resource.data.phone.matches('^\\+?[0-9]{9,15}$')
+        && request.resource.data.phone == request.auth.token.phone_number
+        && request.resource.data.employment.status in ['employed', 'self-employed', 'business-owner', 'other']
+        && request.resource.data.employment.monthlyIncome is int && request.resource.data.employment.monthlyIncome > 0
+        && request.resource.data.employment.monthlyIncome <= 1000000000
+        && request.resource.data.amount is int && request.resource.data.amount >= 100000 && request.resource.data.amount <= 50000000
+        && request.resource.data.months is int && request.resource.data.months >= 1 && request.resource.data.months <= 36
+        && request.resource.data.purpose is string && request.resource.data.purpose.size() <= 200
+        && request.resource.data.ninLast4 is string && request.resource.data.ninLast4.size() == 4
+        && request.resource.data.docs.front == 'loan-ids/' + request.auth.uid + '/' + id + '/front.jpg'
+        && request.resource.data.docs.back == 'loan-ids/' + request.auth.uid + '/' + id + '/back.jpg'
+        && request.resource.data.consent.accepted == true
+        && request.resource.data.consent.at == request.time
+        && request.resource.data.createdAt == request.time
+        && getAfter(/databases/$(database)/documents/loanApplications/$(id)/private/identity).data.uid == request.auth.uid;
+
+      // Only staff change anything, and only these fields.
+      // Approve / reject / disburse need a manager, and a manager can never decide their own application.
+      allow update: if isStaff()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'reviewedBy', 'reviewedByEmail', 'reviewedAt', 'rejectionReason', 'decisionNote', 'approved'])
+        && request.resource.data.reviewedBy == request.auth.uid
+        && (
+          (resource.data.status == 'submitted' && request.resource.data.status == 'under_review')
+          || (isManager() && request.auth.uid != resource.data.uid
+              && resource.data.status in ['submitted', 'under_review'] && request.resource.data.status == 'approved'
+              && request.resource.data.approved.amount is int && request.resource.data.approved.amount > 0
+              && request.resource.data.approved.months is int && request.resource.data.approved.months >= 1
+              && request.resource.data.approved.months <= 36)
+          || (isManager() && request.auth.uid != resource.data.uid
+              && resource.data.status in ['submitted', 'under_review'] && request.resource.data.status == 'rejected'
+              && request.resource.data.rejectionReason is string && request.resource.data.rejectionReason.size() >= 5
+              && request.resource.data.rejectionReason.size() <= 500)
+          || (isManager() && resource.data.status == 'approved' && request.resource.data.status == 'active')
+          || (resource.data.status == 'active' && request.resource.data.status in ['completed', 'defaulted'])
+        );
+      allow delete: if false;
+
+      // NIN: the customer can write it once with the application and can never read it back.
+      // Only staff can read it, and the app records every reveal in auditLog.
+      match /private/{docId} {
+        allow create: if phoneVerified() && docId == 'identity'
+          && request.resource.data.keys().hasOnly(['uid', 'nin', 'createdAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.nin is string && request.resource.data.nin.matches('^C[MF][A-Z0-9]{12}$')
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/loanApplications/$(id)).data.uid == request.auth.uid;
+        allow read: if isStaff();
+        allow update, delete: if false;
+      }
+
+      match /schedule/{n} {
+        allow read: if isStaff()
+          || (verified() && get(/databases/$(database)/documents/loanApplications/$(id)).data.uid == request.auth.uid);
+        // Created by a manager in the same batch that approves the loan.
+        allow create: if isManager()
+          && getAfter(/databases/$(database)/documents/loanApplications/$(id)).data.status == 'approved'
+          && request.resource.data.keys().hasOnly(['n', 'due', 'amount', 'status'])
+          && request.resource.data.status == 'due';
+        // Staff record a payment against an active loan. Nothing else can change.
+        allow update: if isStaff()
+          && get(/databases/$(database)/documents/loanApplications/$(id)).data.status == 'active'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'paidAt', 'recordedBy'])
+          && resource.data.status == 'due' && request.resource.data.status == 'paid'
+          && request.resource.data.recordedBy == request.auth.uid;
+        allow delete: if false;
+      }
+    }
+
+    // Append-only record of staff actions. Nobody can edit or delete entries from the app. Managers can read it.
+    match /auditLog/{entry} {
+      allow read: if isManager();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['actorUid', 'actorEmail', 'action', 'targetId', 'detail', 'at'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.action is string && request.resource.data.action.size() <= 40
+        && request.resource.data.detail is string && request.resource.data.detail.size() <= 300;
+      allow update, delete: if false;
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

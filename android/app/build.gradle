@@ -1,0 +1,61 @@
+// Trusted Web Activity: this app is a thin Android shell that opens the SAME hosted website
+// (and therefore the same Firebase backend and database) full-screen. Nothing is duplicated here.
+//
+// Required:  -PSITE_URL=https://your-site.web.app      (the live https address of the website)
+// Optional:  -PKEYSTORE_PATH= -PKEYSTORE_PASSWORD= -PKEY_ALIAS= -PKEY_PASSWORD=   (release signing)
+//            -PVERSION_CODE=2 -PVERSION_NAME=1.0.1
+
+plugins {
+    id 'com.android.application'
+}
+
+def siteUrl = (project.findProperty('SITE_URL') ?: '').toString().trim()
+if (!siteUrl.startsWith('https://')) {
+    throw new GradleException('Set SITE_URL to the live https address of the website, for example -PSITE_URL=https://your-project.web.app')
+}
+def siteUri = new URI(siteUrl)
+def siteHost = siteUri.host
+def startUrl = siteUrl.endsWith('/') ? siteUrl : siteUrl + '/'
+
+android {
+    namespace 'ug.co.starlinkhypercore.finance'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ug.co.starlinkhypercore.finance'
+        minSdk 21
+        targetSdk 34
+        versionCode (project.findProperty('VERSION_CODE') ?: '1').toString().toInteger()
+        versionName (project.findProperty('VERSION_NAME') ?: '1.0.0').toString()
+        manifestPlaceholders = [hostName: siteHost, defaultUrl: startUrl]
+    }
+
+    signingConfigs {
+        release {
+            if (project.hasProperty('KEYSTORE_PATH')) {
+                storeFile file(project.property('KEYSTORE_PATH'))
+                storePassword project.property('KEYSTORE_PASSWORD')
+                keyAlias project.property('KEY_ALIAS')
+                keyPassword project.property('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (project.hasProperty('KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

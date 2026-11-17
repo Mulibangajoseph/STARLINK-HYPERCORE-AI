@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Starlink Hypercore Finance</title>
+<meta name="description" content="Powering your financial future. Savings, loans and bills for Uganda.">
+<meta name="theme-color" content="#050a1f">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Hypercore">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml"><link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--panel:#0a0d16;--line:#232a3d;--gold1:#fff1b8;--gold2:#e2b44f;--gold3:#9c6b1c;--blue:#4f7cff;--blue2:#1b2a6b;--silver:#c8d0dc;--muted:#8a94a8;--gold:linear-gradient(100deg,var(--gold1),var(--gold2) 45%,var(--gold3));color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--silver);font:400 16px/1.65 Manrope,system-ui,"Segoe UI",Roboto,sans-serif;background-image:radial-gradient(900px 500px at 85% -5%,rgba(79,124,255,.22),transparent 60%),radial-gradient(700px 400px at 0% 30%,rgba(27,42,107,.28),transparent 60%)}
+h1,h2,h3{font-family:Syne,"Segoe UI",Roboto,sans-serif;margin:0;line-height:1.15}
+h1,h2{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:clamp(2.2rem,6vw,4.1rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(1.7rem,3.6vw,2.4rem);font-weight:700}
+h3{font-size:1.1rem;color:#f3f5fa;font-weight:700}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+header{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);margin-top:calc(-1*env(safe-area-inset-top,0px))}
+.bar{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:Syne,sans-serif;font-weight:800;line-height:1.05}
+.brand small{display:block;font:500 .66rem Manrope,sans-serif;color:var(--muted);letter-spacing:.04em}
+.brand b{font-size:1rem;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0}
+nav a{text-decoration:none;font-size:.93rem;color:var(--silver);padding:6px 0;border-bottom:1px solid transparent}
+nav a:hover{color:#fff;border-color:var(--blue)}
+.actions{display:flex;gap:10px;align-items:center}
+.btn{font:600 .93rem Manrope,sans-serif;border-radius:10px;padding:11px 20px;border:1px solid transparent;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+.btn.gold{background:var(--gold);color:#1a1200}
+.btn.gold:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--silver);border-color:#46506a}
+.btn.ghost:hover{border-color:var(--blue);color:#fff}
+.menu{display:none;background:none;border:1px solid #46506a;color:var(--silver);border-radius:10px;width:44px;height:44px;font-size:1.2rem;cursor:pointer}
+.hero{padding:72px 0 64px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.slogan{color:var(--blue);font-weight:600;margin-bottom:14px;letter-spacing:.06em;font-size:.85rem}
+.hero p.lead{font-size:1.1rem;margin:20px 0 30px;max-width:52ch;color:var(--silver)}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.dash{background:linear-gradient(160deg,#0d1226,#05070e);border:1px solid #2b3556;border-radius:18px;padding:22px;box-shadow:0 0 0 1px rgba(226,180,79,.08),0 30px 80px rgba(27,42,107,.45)}
+.dash .row{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--muted)}
+.dash .amt{font:700 clamp(1.7rem,4vw,2.3rem) Syne,sans-serif;color:#fff;margin:6px 0 2px}
+.dash .up{color:#6fe0a8;font-size:.85rem}
+.dash svg{width:100%;height:90px;margin:12px 0}
+.tx{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.tx li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.tx span:last-child{color:#fff}
+.demo{font-size:.75rem;color:var(--muted);margin-top:12px}
+section.s{padding:72px 0;border-top:1px solid var(--line)}
+.head{max-width:60ch;margin-bottom:34px}
+.head p{margin-top:10px;color:var(--muted)}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card:hover{border-color:#3b4a80}
+.card p{margin-top:8px;color:var(--muted);font-size:.94rem}
+.ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;margin-bottom:16px;background:var(--blue2);color:var(--gold1);font-size:1.15rem}
+.loan{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.panel{background:linear-gradient(160deg,#0d1226,#06080f);border:1px solid #2b3556;border-radius:16px;padding:26px}
+label{display:block;font-size:.88rem;margin:14px 0 6px;color:var(--silver)}
+input[type=range]{width:100%;accent-color:var(--blue);min-height:32px}
+#lo,#ins{white-space:nowrap}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;background:#05070e;color:#fff;border:1px solid #38425f;border-radius:10px;padding:12px;font:inherit;min-height:44px}
+.val{display:flex;justify-content:space-between;font-size:.88rem}
+.val b{color:#fff}
+.res{display:grid;gap:12px;margin-top:6px}
+.res div{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:12px 0}
+.res strong{font:700 1.35rem Syne,sans-serif;color:var(--gold2)}
+.types{display:grid;gap:12px;margin-top:6px}
+.types div{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#05070e}
+.types b{color:#fff;display:block}
+.types span{font-size:.88rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.chip{border:1px solid #38425f;border-radius:999px;padding:8px 16px;font-size:.9rem;color:var(--silver);background:#05070e}
+.bill{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.inv{width:100%;border-collapse:collapse;font-size:.92rem}
+.inv td{padding:12px 0;border-bottom:1px solid var(--line)}
+.inv td:last-child{text-align:right;color:#fff}
+.tag{font-size:.75rem;padding:3px 10px;border-radius:999px;background:var(--blue2);color:#cfdcff;margin-left:8px}
+.contact{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px}
+.contact ul{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:14px}
+.contact li b{display:block;color:#fff}
+footer{border-top:1px solid var(--line);padding:30px 0 40px;color:var(--muted);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+dialog{background:#0a0d16;color:var(--silver);border:1px solid #3b4a80;border-radius:16px;padding:28px;width:min(420px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.75)}
+dialog h3{font-size:1.4rem;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6px}
+dialog form{display:grid;gap:4px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:#101733;border:1px solid var(--blue);color:#fff;padding:12px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+body.in .out,body.pend .out,body:not(.in) .inn,body:not(.pend) .pnd,body:not(.in):not(.pend) .lg{display:none!important}
+body.in nav li:not(.inn),body.pend nav li{display:none}
+[hidden]{display:none!important}
+.lnk{background:none;border:0;color:#7fb0ff;cursor:pointer;padding:8px 0;font:inherit;font-size:.88rem;text-align:left;min-height:44px}
+#vf{padding:56px 0}#vf .panel{max-width:560px;margin-inline:auto}#vf p{margin:12px 0;color:var(--silver)}#prof{margin-top:18px}
+.who{font-size:.88rem;color:var(--silver)}
+#app{padding:44px 0 72px}
+.hi{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+.hi p{color:var(--muted);margin-top:6px}
+.kpi{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.kpi small,.det small{color:var(--muted)}
+.kpi .n{font:700 1.6rem Syne,sans-serif;color:#fff;margin-top:4px}
+.bar2{height:8px;border-radius:99px;background:#1a2036;overflow:hidden;margin:12px 0 6px}
+.bar2 i{display:block;height:100%;background:var(--gold)}
+.qa{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:18px 0}
+.two{display:grid;grid-template-columns:1.3fr .9fr;gap:18px}
+.det div{padding:12px 0;border-bottom:1px solid var(--line)}
+.det b{display:block;color:#fff;font-weight:600;overflow-wrap:anywhere}
+.err{color:#ff8f8f;font-size:.86rem;min-height:1.3em;margin:8px 0 0}
+.dnav{display:flex;gap:8px;overflow-x:auto;margin-bottom:22px;padding-bottom:4px}
+.dnav button{flex:none;background:#070d26;color:var(--silver);border:1px solid #2c3d78;border-radius:999px;padding:10px 18px;font:600 .9rem Manrope,sans-serif;cursor:pointer;min-height:44px}
+.dnav button.on{background:linear-gradient(100deg,#1d4fff,#00a8ff);color:#fff;border-color:transparent}
+.stage{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;perspective:1200px;margin-bottom:18px}
+.bal{position:relative;overflow:hidden;border-radius:22px;padding:30px;background:linear-gradient(135deg,#0b1f6b 0%,#050a1f 58%,#000 100%);border:1px solid #2f58d6;box-shadow:0 34px 70px rgba(20,80,255,.35),inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 70px rgba(47,107,255,.18);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s}
+.bal::before{content:"";position:absolute;right:-90px;top:-130px;width:340px;height:340px;border-radius:50%;border:1px solid rgba(226,180,79,.45);box-shadow:0 0 0 36px rgba(0,168,255,.07),0 0 0 78px rgba(0,168,255,.04);transform:rotateX(66deg) rotate(24deg)}
+.bal>*{position:relative}
+.bal small{color:#9db4ff}
+.bn{font:800 clamp(2rem,7vw,3.3rem) Syne,sans-serif;margin:6px 0 2px;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
+.ba{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.btn.blue{background:linear-gradient(100deg,#1d4fff,#00a8ff);color:#fff}
+.btn.blue:hover{filter:brightness(1.12)}
+.side{display:grid;gap:18px}
+.mini{border-radius:18px;padding:22px;background:linear-gradient(160deg,#0a1235,#04060f);border:1px solid #243468;box-shadow:0 18px 40px rgba(0,30,120,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+.mini small{color:var(--muted)}
+.mini .n{font:700 1.5rem Syne,sans-serif;color:#fff;margin-top:4px;overflow-wrap:anywhere}
+.mini.inc{border-left:3px solid #4f9bff}.mini.exp{border-left:3px solid var(--gold2)}
+.tx .empty{color:var(--muted);justify-content:flex-start}
+.tx .pos{color:#7fb0ff!important}.tx .neg{color:var(--gold2)!important}
+input[type=number]{width:100%;background:#05070e;color:#fff;border:1px solid #38425f;border-radius:10px;padding:12px;font:inherit;min-height:44px}
+@media(max-width:900px){.stage{grid-template-columns:1fr}.dnav{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(4,8,24,.97);border-top:1px solid #2c4aa8}.dnav button{padding:10px 12px;font-size:.8rem}#app{padding-bottom:110px}body.in .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+@media(max-width:900px){
+ .hero .wrap,.loan,.bill,.contact{grid-template-columns:1fr}
+ .menu{display:block}
+ nav{position:absolute;left:0;right:0;top:100%;background:#000;border-bottom:1px solid var(--line);display:none;padding:10px 20px 18px}
+ nav.open{display:block}
+ nav ul{flex-direction:column;gap:2px}
+ nav a{display:block;padding:12px 0}
+ .actions .btn{padding:10px 14px}
+ .actions .hide-sm{display:none}
+ .hero{padding-top:44px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:14px;text-align:center;background:radial-gradient(circle at 50% 38%,#0b1f6b,#050a1f 55%,#000);transition:opacity .4s}
+#splash img{width:112px;height:112px;border-radius:26px;box-shadow:0 0 70px rgba(47,107,255,.55)}
+#splash b{font:800 1.2rem Syne,sans-serif;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+#splash small{color:var(--muted);font-size:.78rem;letter-spacing:.06em}
+#splash.off{opacity:0;pointer-events:none}
+html{-webkit-tap-highlight-color:transparent}
+dialog.wide{width:min(560px,94vw);max-height:92vh;overflow-y:auto}
+dialog fieldset{border:1px solid var(--line);border-radius:12px;margin:0 0 12px;padding:6px 14px 14px}
+dialog legend{color:var(--gold2);font-weight:600;font-size:.88rem;padding:0 6px}
+dialog h4{margin:20px 0 0;color:var(--gold2);font:700 .95rem Syne,sans-serif}
+fieldset:disabled{opacity:.45}
+label.chk{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;line-height:1.5}
+label.chk input{margin-top:4px;width:20px;height:20px;flex:none}
+input[type=date],input[type=tel],input[type=file]{width:100%;background:#05070e;color:#fff;border:1px solid #38425f;border-radius:10px;padding:12px;font:inherit;min-height:44px}
+.st{font-size:.75rem;padding:3px 10px;border-radius:999px;background:var(--blue2);color:#cfdcff;white-space:nowrap}
+.st.approved,.st.active,.st.completed{background:#14452c;color:#9af0c0}.st.rejected,.st.defaulted{background:#5a1c1c;color:#ffb4b4}
+.ln{display:block}.ln small{display:block;color:var(--muted)}
+.sch{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px}.sch td{padding:6px 0;border-bottom:1px solid var(--line)}.sch td:last-child{text-align:right}
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><img src="icons/icon-192.png" alt=""><b>STARLINK HYPERCORE FINANCE</b><small>POWERING YOUR FINANCIAL FUTURE</small></div>
+<script>(function(){var s=document.getElementById('splash'),sa=matchMedia('(display-mode: standalone)').matches||navigator.standalone;if(!sa){s.remove();return}addEventListener('load',function(){setTimeout(function(){s.classList.add('off');setTimeout(function(){s.remove()},450)},700)})})();</script>
+<header>
+ <div class="wrap bar">
+  <a class="brand" href="#home" aria-label="Starlink Hypercore Finance home">
+   <svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#e2b44f"/><stop offset="1" stop-color="#9c6b1c"/></linearGradient></defs><ellipse cx="20" cy="20" rx="18" ry="7" fill="none" stroke="#4f7cff" stroke-width="1.6" transform="rotate(-28 20 20)"/><path d="M20 4l3.6 11.2L35 20l-11.4 4.8L20 36l-3.6-11.2L5 20l11.4-4.8z" fill="url(#g)"/><circle cx="33" cy="10" r="2" fill="#c8d0dc"/></svg>
+   <span><b>STARLINK HYPERCORE</b><small>FINANCE</small></span>
+  </a>
+  <nav id="nav" aria-label="Main">
+   <ul>
+    <li><a href="#home">Home</a></li>
+    <li class="inn"><a href="#app">Dashboard</a></li>
+    <li><a href="#services">Our Services</a></li>
+    <li><a href="#loans">Loans</a></li>
+    <li><a href="#billing">Billing</a></li>
+    <li><a href="#contact">Support</a></li>
+   </ul>
+  </nav>
+  <div class="actions">
+   <button class="btn ghost hide-sm out" data-open="login">Customer Login</button>
+   <button class="btn gold hide-sm out" data-open="signup">Create Account</button>
+   <button class="btn ghost" id="ins" hidden>Install app</button><span class="inn hide-sm who" id="who"></span><button class="btn ghost lg" id="lo">Log out</button>
+   <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="nav">&#9776;</button>
+  </div>
+ </div>
+</header>
+
+<main class="out">
+<section class="hero" id="home">
+ <div class="wrap">
+  <div>
+   <p class="slogan">POWERING YOUR FINANCIAL FUTURE</p>
+   <h1>Welcome to Starlink Hypercore Finance</h1>
+   <p class="lead">Savings, loans and everyday bill payments, built for Ugandans and run from one clear dashboard on your laptop or phone.</p>
+   <div class="cta">
+    <button class="btn ghost" data-open="login">Customer Login</button>
+    <button class="btn gold" data-open="signup">Create Account</button>
+   </div>
+  </div>
+  <div class="dash" aria-label="Demo dashboard preview">
+   <div class="row"><span>Main account (demo)</span><span>Kampala</span></div>
+   <div class="amt">UGX 4,250,000</div>
+   <div class="up">+6.4% this month</div>
+   <svg viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f7cff" stop-opacity=".5"/><stop offset="1" stop-color="#4f7cff" stop-opacity="0"/></linearGradient></defs><path d="M0 70 L40 60 L80 66 L120 44 L160 50 L200 28 L240 34 L300 10 L300 90 L0 90Z" fill="url(#a)"/><path d="M0 70 L40 60 L80 66 L120 44 L160 50 L200 28 L240 34 L300 10" fill="none" stroke="#e2b44f" stroke-width="2.5"/></svg>
+   <ul class="tx">
+    <li><span>Salary deposit</span><span>+ 1,800,000</span></li>
+    <li><span>Electricity bill</span><span>- 85,000</span></li>
+    <li><span>Savings goal transfer</span><span>- 300,000</span></li>
+   </ul>
+   <p class="demo">Sample figures for demonstration only.</p>
+  </div>
+ </div>
+</section>
+
+<section class="s" id="services">
+ <div class="wrap">
+  <div class="head"><h2>Our Services</h2><p>Everything a household or small business needs to save, borrow and pay.</p></div>
+  <div class="grid">
+   <div class="card"><div class="ic">&#9679;</div><h3>Savings Accounts</h3><p>Set goals, save in UGX and watch your balance grow.</p></div>
+   <div class="card"><div class="ic">&#9650;</div><h3>Business Finance</h3><p>Working capital and record keeping for shops, traders and startups.</p></div>
+   <div class="card"><div class="ic">&#9670;</div><h3>Money Transfers</h3><p>Send and receive money between accounts and mobile wallets.</p></div>
+   <div class="card"><div class="ic">&#9733;</div><h3>Financial Advice</h3><p>Plan budgets, school fees and investments with a finance officer.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="s" id="loans">
+ <div class="wrap">
+  <div class="head"><h2>Loan Services</h2><p>Try the estimator below. Rates and terms are sample values and no loans are issued in this prototype.</p></div>
+  <div class="loan">
+   <div class="panel">
+    <h3>Repayment estimator</h3>
+    <label for="amt">Loan amount</label>
+    <div class="val"><span>UGX</span><b id="amtv"></b></div>
+    <input id="amt" type="range" min="500000" max="20000000" step="100000" value="3000000">
+    <label for="mo">Repayment period</label>
+    <div class="val"><span>Months</span><b id="mov"></b></div>
+    <input id="mo" type="range" min="3" max="36" step="1" value="12">
+    <div class="res">
+     <div><span>Monthly payment</span><strong id="pay"></strong></div>
+     <div><span>Total to repay</span><strong id="tot"></strong></div>
+    </div>
+    <p class="demo">Demo rate: 2% per month, flat. Not a real offer.</p>
+   </div>
+   <div class="panel">
+    <h3>Loan types</h3>
+    <div class="types">
+     <div><b>Personal loans</b><span>For emergencies, rent deposits and planned purchases.</span></div>
+     <div><b>Business loans</b><span>Stock, equipment and growth for registered or informal businesses.</span></div>
+     <div><b>School fees loans</b><span>Spread term fees into manageable monthly payments.</span></div>
+     <div><b>Salary advance</b><span>Short-term cover for salaried customers until payday.</span></div>
+    </div>
+    <div style="margin-top:20px"><button class="btn gold" data-open="signup">Create account to apply later</button></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="s" id="billing">
+ <div class="wrap">
+  <div class="head"><h2>Billing and Payments</h2><p>Pay bills and track every payment in one place. Payments are not connected in this prototype.</p></div>
+  <div class="bill">
+   <div class="panel">
+    <h3>Pay a bill</h3>
+    <div class="chips"><span class="chip">Electricity</span><span class="chip">Water</span><span class="chip">Airtime and data</span><span class="chip">Internet</span><span class="chip">TV</span><span class="chip">School fees</span><span class="chip">Taxes</span></div>
+    <p class="demo" style="margin-top:18px">Bill categories are examples. Provider connections will come in a later phase.</p>
+   </div>
+   <div class="panel">
+    <h3>Recent payments (demo)</h3>
+    <table class="inv"><tbody>
+     <tr><td>Electricity<span class="tag">Paid</span></td><td>UGX 85,000</td></tr>
+     <tr><td>Internet<span class="tag">Paid</span></td><td>UGX 120,000</td></tr>
+     <tr><td>Water<span class="tag">Due soon</span></td><td>UGX 45,000</td></tr>
+     <tr><td>School fees<span class="tag">Scheduled</span></td><td>UGX 650,000</td></tr>
+    </tbody></table>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="s" id="contact">
+ <div class="wrap">
+  <div class="head"><h2>Contact and Support</h2><p>Questions about an account, a loan or a payment? Send us a message.</p></div>
+  <div class="contact">
+   <div class="panel">
+    <h3>Reach us</h3>
+    <ul>
+     <li><b>Head office</b>Plot 00, Sample Road, Kampala, Uganda</li>
+     <li><b>Phone</b>+256 700 000 000 (demo number)</li>
+     <li><b>Email</b>support@example.com (demo address)</li>
+     <li><b>Hours</b>Monday to Friday, 8:00 am to 5:00 pm</li>
+    </ul>
+   </div>
+   <div class="panel">
+    <h3>Send a message</h3>
+    <form id="cf">
+     <label for="cn">Full name</label><input id="cn" type="text" required autocomplete="name">
+     <label for="ce">Email</label><input id="ce" type="email" required autocomplete="email">
+     <label for="ct">Topic</label>
+     <select id="ct"><option>Accounts</option><option>Loans</option><option>Billing and payments</option><option>Other</option></select>
+     <label for="cm">Message</label><textarea id="cm" rows="4" required></textarea>
+     <div style="margin-top:14px"><button class="btn gold" type="submit">Send message</button></div>
+    </form>
+   </div>
+  </div>
+ </div>
+</section>
+</main>
+
+<main id="app" class="inn wrap" aria-label="Customer dashboard">
+ <nav class="dnav" aria-label="Dashboard menu">
+  <button class="on" data-go="top">Overview</button><button data-go="txs">Transactions</button><button data-go="loans-app">Loans</button><button data-soon>Bills</button><button data-go="prof">Profile</button>
+ </nav>
+ <div class="hi"><div><h2 id="hello">Welcome back</h2><p>Your Starlink Hypercore overview. Entries you record are a demo ledger, not real money.</p></div><span class="tag" style="margin:0">Demo mode</span></div>
+ <div class="stage">
+  <div class="bal" id="bal">
+   <small>Total balance (demo ledger)</small>
+   <div class="bn" id="bv">UGX 0</div>
+   <p class="demo">Not a bank balance. Nothing here moves real money.</p>
+   <div class="ba"><button class="btn gold" data-led="in">Record deposit</button><button class="btn blue" data-led="out">Record withdrawal</button></div>
+  </div>
+  <div class="side">
+   <div class="mini inc"><small>Income</small><div class="n" id="iv">UGX 0</div></div>
+   <div class="mini exp"><small>Expenses</small><div class="n" id="ov">UGX 0</div></div>
+  </div>
+ </div>
+ <div class="two">
+  <div class="panel" id="txs"><h3>Recent transactions</h3><ul class="tx" id="txl" style="margin-top:12px"></ul></div>
+  <div class="panel det"><h3>Account details</h3>
+   <div><small>Email</small><b id="ae"></b></div><div><small>Member since</small><b id="am"></b></div>
+   <div><small>Data storage</small><b id="dsr"></b></div><div><small>Firebase</small><b id="fbs"></b></div></div>
+ </div>
+<div class="panel" id="loans-app" style="margin-bottom:18px">
+  <div class="hi" style="margin-bottom:8px"><div><h3>My loans</h3><p class="demo" style="margin:4px 0 0">Applying for a loan needs your National ID. Registering and using the rest of the app does not.</p></div>
+   <button class="btn gold" id="la-open">Apply for a loan</button></div>
+  <ul class="tx" id="la-list" style="margin-top:12px"></ul>
+ </div>
+<div class="panel det" id="prof"><h3>Profile</h3>
+  <form id="pf"><label for="pn">Full name</label><input id="pn" type="text" required maxlength="60" autocomplete="name">
+   <div><small>Email</small><b id="pe"></b></div><div><small>Email status</small><b id="pv"></b></div><div><small>Phone</small><b id="pph"></b></div>
+   <div class="ba"><button class="btn gold" type="submit">Save name</button><button class="btn ghost" type="button" id="pr">Send password reset email</button></div></form></div>
+</main>
+
+<main id="vf" class="pnd wrap" aria-label="Verify your account">
+ <div class="panel" id="vs-email"><h2>Step 1 of 2: verify your email</h2>
+  <p>We sent a verification link to <b id="vm"></b>. Open it, then press the button below to continue.</p>
+  <div class="ba"><button class="btn gold" id="vc">I have verified my email</button><button class="btn ghost" id="vr">Resend email</button></div>
+  <div class="ba" id="vdw"><button class="btn blue" id="vd">Demo: mark email as verified</button></div>
+  <p class="demo" id="vn"></p></div>
+ <div class="panel" id="vs-phone" hidden><h2>Step 2 of 2: verify your phone</h2>
+  <p>We will text a 6-digit code to your phone number. No National ID is needed for this step.</p>
+  <form id="pf1" autocomplete="off">
+   <label for="pp-num">Phone number</label>
+   <input id="pp-num" type="tel" required inputmode="tel" placeholder="0772 123456" autocomplete="tel">
+   <div class="ba"><button class="btn gold" type="submit" id="pp-send">Send code</button></div>
+  </form>
+  <form id="pf2" autocomplete="off" hidden>
+   <p>Code sent to <b id="pp-to"></b>.</p>
+   <label for="pp-code">6-digit code</label>
+   <input id="pp-code" type="text" required inputmode="numeric" maxlength="7" autocomplete="one-time-code" placeholder="123456">
+   <div class="ba"><button class="btn gold" type="submit" id="pp-ok">Verify phone</button><button class="btn ghost" type="button" id="pp-back">Use a different number</button></div>
+  </form>
+  <p class="err" id="pp-err" role="alert"></p>
+  <p class="demo" id="pp-note"></p></div>
+</main>
+
+<footer>
+ <div class="wrap">
+  <span>&copy; 2026 Starlink Hypercore Finance. Prototype with demonstration data only.</span>
+  <span>POWERING YOUR FINANCIAL FUTURE</span>
+ </div>
+</footer>
+
+<dialog id="dlg">
+ <h3 id="dt"></h3>
+ <p class="demo" id="dnote" style="margin-bottom:10px"></p>
+ <p class="demo" id="dnid" style="margin-bottom:10px" hidden>No National ID is needed to create an account. We only ask for it if you apply for a loan.</p>
+ <form id="df">
+  <div id="nm" hidden><label for="dn">Full name</label><input id="dn" type="text" autocomplete="name"></div>
+  <label for="de">Email</label><input id="de" type="email" required autocomplete="email">
+  <div id="pw"><label for="dp">Password</label><input id="dp" type="password" required minlength="8" autocomplete="current-password"><button type="button" class="lnk" id="fp">Forgot password?</button></div>
+  <p class="err" id="derr" role="alert"></p>
+  <div style="display:flex;gap:10px;margin-top:10px"><button class="btn gold" type="submit" id="ds"></button><button class="btn ghost" type="button" id="dc">Cancel</button></div>
+ </form>
+</dialog>
+<dialog id="ldg">
+ <h3 id="lt">Record a demo deposit</h3>
+ <p class="demo" style="margin-bottom:10px">Demo ledger entry. No real money moves.</p>
+ <form id="lf">
+  <label for="la">Amount (UGX)</label><input id="la" type="number" min="1" max="1000000000" step="1" required inputmode="numeric">
+  <label for="ln">Note (optional)</label><input id="ln" type="text" maxlength="40">
+  <p class="err" id="lerr" role="alert"></p>
+  <div style="display:flex;gap:10px;margin-top:10px"><button class="btn gold" type="submit">Save entry</button><button class="btn ghost" type="button" id="lc">Cancel</button></div>
+ </form>
+</dialog>
+<dialog id="lapp" class="wide">
+ <h3>Loan application</h3>
+ <p class="demo" style="margin-bottom:10px">Your application goes to our staff for review. Nothing is approved automatically.</p>
+ <form id="laf" autocomplete="off">
+  <fieldset><legend>1. Consent</legend>
+   <label class="chk"><input type="checkbox" id="la-consent"> <span id="la-consent-text"></span></label>
+  </fieldset>
+  <fieldset id="la-body" disabled><legend>2. Identity</legend>
+   <label for="la-name">Full legal names (as on your National ID)</label><input id="la-name" type="text" maxlength="100" required autocomplete="name">
+   <label for="la-nin">National Identification Number (NIN)</label><input id="la-nin" type="text" maxlength="14" required autocapitalize="characters" spellcheck="false" placeholder="CM12345678ABCD">
+   <label for="la-dob">Date of birth</label><input id="la-dob" type="date" required>
+   <label for="la-phone">Phone number (verified by SMS code)</label><input id="la-phone" type="tel" required inputmode="tel" placeholder="0772 123456" autocomplete="tel">
+   <label for="la-front">National ID, front</label><input id="la-front" type="file" accept="image/jpeg,image/png,image/webp" required>
+   <label for="la-back">National ID, back</label><input id="la-back" type="file" accept="image/jpeg,image/png,image/webp" required>
+   <p class="demo">Use clear photos with all four corners visible. They are resized and sent over a secure connection, and only authorised staff can open them.</p>
+   <h4>3. Work and income</h4>
+   <label for="la-emp">Employment status</label>
+   <select id="la-emp" required><option value="">Choose...</option><option value="employed">Employed</option><option value="self-employed">Self-employed</option><option value="business-owner">Business owner</option><option value="other">Other</option></select>
+   <label for="la-employer">Employer or business name</label><input id="la-employer" type="text" maxlength="80">
+   <label for="la-title">Job title or type of work</label><input id="la-title" type="text" maxlength="60">
+   <label for="la-income">Average monthly income (UGX)</label><input id="la-income" type="number" min="1" max="1000000000" step="1" inputmode="numeric" required>
+   <h4>4. Loan you want</h4>
+   <label for="la-amt">Loan amount</label>
+   <div class="val"><span>UGX</span><b id="la-amtv"></b></div>
+   <input id="la-amt" type="range" min="500000" max="20000000" step="100000" value="3000000">
+   <label for="la-mo">Repayment period</label>
+   <div class="val"><span>Months</span><b id="la-mov"></b></div>
+   <input id="la-mo" type="range" min="3" max="36" step="1" value="12">
+   <p class="demo" id="la-est"></p>
+   <label for="la-purpose">What is the loan for? (optional)</label><input id="la-purpose" type="text" maxlength="200">
+  </fieldset>
+  <p class="err" id="la-err" role="alert"></p>
+  <div style="display:flex;gap:10px;margin-top:10px"><button class="btn gold" type="submit" id="la-submit" disabled>Submit for review</button><button class="btn ghost" type="button" id="la-cancel">Cancel</button></div>
+ </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import { Auth, Ledger } from './auth-firebase.js';
+import { initLoans } from './loan-ui.js';
+if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+(function(){
+ var $=function(i){return document.getElementById(i)};
+ var nav=$('nav'),menu=$('menu');
+ menu.addEventListener('click',function(){var o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',o)});
+ nav.addEventListener('click',function(e){if(e.target.tagName==='A'){nav.classList.remove('open');menu.setAttribute('aria-expanded',false)}});
+ var t=$('toast'),tm;
+ function toast(m){t.textContent=m;t.classList.add('on');clearTimeout(tm);tm=setTimeout(function(){t.classList.remove('on')},3200)}
+ var dlg=$('dlg'),mode='login';
+ function openD(m){mode=m;var T={login:['Customer Login','Log in'],signup:['Create Account','Create account'],reset:['Reset password','Send reset link']}[m];
+ $('dt').textContent=T[0];$('ds').textContent=T[1];$('nm').hidden=m!=='signup';$('dnid').hidden=m!=='signup';$('dn').required=m==='signup';
+ $('pw').hidden=m==='reset';$('dp').required=m!=='reset';$('fp').hidden=m!=='login';
+ $('dp').autocomplete=m==='signup'?'new-password':'current-password';$('derr').textContent='';$('dnote').textContent=Auth.note;
+ if(!dlg.open)dlg.showModal()}
+ document.querySelectorAll('[data-open]').forEach(function(b){b.addEventListener('click',function(){openD(b.dataset.open)})});
+ $('dc').addEventListener('click',function(){dlg.close()});
+  function fmt(n){return 'UGX '+Math.round(n).toLocaleString('en-UG')}
+ var cache=[];
+ function paint(L){
+  var i=0,o=0,ul=$('txl');
+  L.forEach(function(x){if(x.t==='in')i+=x.a;else o+=x.a});
+  $('bv').textContent=fmt(i-o);$('iv').textContent=fmt(i);$('ov').textContent=fmt(o);
+  ul.textContent='';
+  if(!L.length){var e=document.createElement('li');e.className='empty';e.textContent='No transactions yet. Record a demo deposit to start your ledger.';ul.appendChild(e)}
+  L.slice(-8).reverse().forEach(function(x){
+   var li=document.createElement('li'),a=document.createElement('span'),b=document.createElement('span');
+   a.textContent=x.n+' ('+new Date(x.d).toLocaleDateString('en-UG',{day:'numeric',month:'short'})+')';
+   b.textContent=(x.t==='in'?'+ ':'- ')+x.a.toLocaleString('en-UG');b.className=x.t==='in'?'pos':'neg';
+   li.appendChild(a);li.appendChild(b);ul.appendChild(li);
+  });
+ }
+ function render(){
+  if(!Auth.user())return;
+  Ledger.list().then(function(L){cache=L;paint(L)}).catch(function(){toast('Could not load your records. Check your connection.')});
+ }
+ var ldg=$('ldg'),lt='in';
+ document.querySelectorAll('[data-led]').forEach(function(b){b.addEventListener('click',function(){lt=b.dataset.led;$('lt').textContent=lt==='in'?'Record a demo deposit':'Record a demo withdrawal';$('lerr').textContent='';ldg.showModal()})});
+ $('lc').addEventListener('click',function(){ldg.close()});
+ $('lf').addEventListener('submit',function(e){
+  e.preventDefault();
+  var a=Math.round(+$('la').value),bal=cache.reduce(function(s,x){return s+(x.t==='in'?x.a:-x.a)},0);
+  if(!(a>0)||a>1e9){$('lerr').textContent='Enter an amount between 1 and 1,000,000,000.';return}
+  if(lt==='out'&&a>bal){$('lerr').textContent='This is more than your demo balance of '+fmt(bal)+'.';return}
+  var en={t:lt,a:a,n:($('ln').value.trim()||(lt==='in'?'Demo deposit':'Demo withdrawal')).slice(0,40)};
+  Ledger.add(en).then(function(){ldg.close();$('lf').reset();render();toast(lt==='in'?'Demo deposit recorded.':'Demo withdrawal recorded.')})
+   .catch(function(){$('lerr').textContent='Could not save. Check your connection and try again.'});
+ });
+ document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.dnav button').forEach(function(x){x.classList.toggle('on',x===b)});
+  if(b.dataset.go==='top')window.scrollTo({top:0,behavior:'smooth'});else $(b.dataset.go).scrollIntoView({behavior:'smooth',block:'start'});
+ })});
+ var bal=$('bal');
+ if(bal&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  bal.addEventListener('pointermove',function(e){if(e.pointerType==='touch')return;var r=bal.getBoundingClientRect();bal.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*8+'deg');bal.style.setProperty('--rx',(.5-(e.clientY-r.top)/r.height)*8+'deg')});
+  bal.addEventListener('pointerleave',function(){bal.style.setProperty('--rx','0deg');bal.style.setProperty('--ry','0deg')});
+ }
+ var last='';
+ function fmtDate(d){var x=new Date(d);return isNaN(x)?'':x.toLocaleDateString('en-UG',{year:'numeric',month:'long',day:'numeric'})}
+ function view(){
+  var u=Auth.user(),k=u?(u.verified&&u.phoneVerified?'in':'pend'):'out';
+  document.body.classList.toggle('in',k==='in');document.body.classList.toggle('pend',k==='pend');
+  if(u){$('vs-email').hidden=!!u.verified;$('vs-phone').hidden=!u.verified;$('pph').textContent=u.phoneVerified?u.phone+' (verified)':'Not verified';if(u.phoneVerified)phoneReset()}
+  $('pp-note').textContent=Auth.mode==='demo'?'Demo mode: no SMS is sent. The code is shown on screen.':'';
+  $('fbs').textContent=Auth.mode==='firebase'?'Connected (Authentication and Firestore)':'Not configured';$('dsr').textContent=Auth.mode==='firebase'?'Your Firebase account (Firestore)':'This browser only';
+  $('vdw').hidden=Auth.mode!=='demo';$('vn').textContent=Auth.mode==='demo'?'Demo mode: no email is sent. Use the demo button to simulate verification.':'';
+  if(u){var nm=u.name||u.email;$('hello').textContent='Welcome back, '+nm.split(' ')[0];$('who').textContent=nm;$('ae').textContent=u.email;$('am').textContent=fmtDate(u.since);$('pe').textContent=u.email;$('pn').value=u.name||'';$('pv').textContent=u.verified?'Verified':'Not verified';$('vm').textContent=u.email}
+  render();if(k!==last){last=k;window.scrollTo(0,0)}
+ }
+ $('df').addEventListener('submit',function(e){
+  e.preventDefault();var b=$('ds'),em=$('de').value.trim(),pw=$('dp').value,p,m=mode;$('derr').textContent='';
+  if(m==='signup'&&!(pw.length>=8&&/[A-Za-z]/.test(pw)&&/[0-9]/.test(pw))){$('derr').textContent='Use at least 8 characters with a letter and a number.';return}
+  b.disabled=true;
+  p=m==='login'?Auth.logIn(em,pw):m==='signup'?Auth.signUp($('dn').value,em,pw):Auth.reset(em);
+  p.then(function(){dlg.close();$('df').reset();toast(m==='reset'?'If an account exists for that email, a reset link has been sent.'+(Auth.mode==='demo'?' (Demo: no email is sent.)':''):m==='signup'?'Account created. Check your email to verify it.':'Logged in.')})
+   .catch(function(x){$('derr').textContent=x.message||'Something went wrong. Try again.'})
+   .then(function(){b.disabled=false});
+ });
+ $('fp').addEventListener('click',function(){openD('reset')});
+ $('lo').addEventListener('click',function(){Auth.logOut().then(function(){toast('You have logged out.')})});
+ $('vc').addEventListener('click',function(){Auth.check().then(function(){var u=Auth.user();if(u&&!u.verified)toast('Not verified yet. Open the link in your email first.')}).catch(function(x){toast(x.message)})});
+ $('vr').addEventListener('click',function(){Auth.resend().then(function(){toast(Auth.mode==='demo'?'Demo: no email is sent.':'Verification email sent.')}).catch(function(x){toast(x.message)})});
+ $('vd').addEventListener('click',function(){Auth.verifyDemo()});
+ function phoneReset(){Auth.cancelPhone();$('pf1').hidden=false;$('pf2').hidden=true;$('pp-err').textContent='';$('pp-code').value=''}
+ $('pf1').addEventListener('submit',function(e){
+  e.preventDefault();var b=$('pp-send');b.disabled=true;$('pp-err').textContent='';
+  Auth.sendPhoneCode($('pp-num').value,'pp-send').then(function(r){
+   $('pp-to').textContent=r.phone;$('pf1').hidden=true;$('pf2').hidden=false;$('pp-code').focus();
+   toast(r.demoCode?'Demo code: '+r.demoCode:'Code sent by SMS.')
+  }).catch(function(x){$('pp-err').textContent=x.message})
+   .then(function(){b.disabled=false});
+ });
+ $('pf2').addEventListener('submit',function(e){
+  e.preventDefault();var b=$('pp-ok');b.disabled=true;$('pp-err').textContent='';
+  Auth.confirmPhoneCode($('pp-code').value).then(function(){phoneReset();toast('Phone number verified.')})
+   .catch(function(x){$('pp-err').textContent=x.message})
+   .then(function(){b.disabled=false});
+ });
+ $('pp-back').addEventListener('click',phoneReset);
+ $('pf').addEventListener('submit',function(e){e.preventDefault();Auth.setName($('pn').value).then(function(){toast('Profile saved.')}).catch(function(x){toast(x.message)})});
+ $('pr').addEventListener('click',function(){var u=Auth.user();Auth.reset(u.email).then(function(){toast('Password reset requested.'+(Auth.mode==='demo'?' (Demo: no email is sent.)':' Check your email.'))}).catch(function(x){toast(x.message)})});
+ document.querySelectorAll('[data-soon]').forEach(function(b){b.addEventListener('click',function(){toast('Demo only: '+b.textContent.trim()+' arrives in a later phase.')})});
+ var dip=null;
+ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dip=e;$('ins').hidden=false});
+ $('ins').addEventListener('click',function(){if(!dip)return;dip.prompt();dip.userChoice.then(function(){dip=null;$('ins').hidden=true})});
+ window.addEventListener('appinstalled',function(){$('ins').hidden=true;toast('App installed.')});
+ window.addEventListener('offline',function(){toast('You are offline. Some features need a connection.')});
+ window.addEventListener('online',function(){toast('Back online.');render()});
+ var loansUi=initLoans({toast:toast});
+ Auth.onChange(function(){view();loansUi.refresh()});
+ $('cf').addEventListener('submit',function(e){e.preventDefault();$('cf').reset();toast('Demo only: your message was not sent.')});
+ var f=function(n){return 'UGX '+Math.round(n).toLocaleString('en-UG')};
+ function calc(){
+  var a=+$('amt').value,m=+$('mo').value,tot=a*(1+0.02*m);
+  $('amtv').textContent=a.toLocaleString('en-UG');$('mov').textContent=m;
+  $('pay').textContent=f(tot/m);$('tot').textContent=f(tot);
+ }
+ $('amt').addEventListener('input',calc);$('mo').addEventListener('input',calc);calc();
+})();
+</script>
+</body>
+</html>

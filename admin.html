@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050a1f">
+<title>Staff Portal | Starlink Hypercore Finance</title>
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#000;--panel:#0a0d16;--line:#232a3d;--gold1:#fff1b8;--gold2:#e2b44f;--gold3:#9c6b1c;--blue:#4f7cff;--blue2:#1b2a6b;--silver:#c8d0dc;--muted:#8a94a8;--gold:linear-gradient(100deg,var(--gold1),var(--gold2) 45%,var(--gold3));color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--silver);font:400 15px/1.55 system-ui,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+h1,h2,h3{margin:0;line-height:1.2;color:#f3f5fa}
+h1{font-size:1.15rem;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:1.2rem}h3{font-size:1rem;margin-bottom:8px}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+header{border-bottom:1px solid var(--line);background:#05070e;position:sticky;top:0;z-index:5}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;flex-wrap:wrap;padding:8px 0}
+.bar small{display:block;color:var(--muted)}
+.btn{font:600 .88rem system-ui,sans-serif;border-radius:9px;padding:9px 16px;border:1px solid transparent;cursor:pointer;min-height:40px;display:inline-flex;align-items:center}
+.btn.gold{background:var(--gold);color:#1a1200}.btn.blue{background:linear-gradient(100deg,#1d4fff,#00a8ff);color:#fff}
+.btn.ghost{background:transparent;color:var(--silver);border-color:#46506a}.btn.red{background:#7a1f1f;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.panel{background:#0a0d16;border:1px solid #2b3556;border-radius:14px;padding:20px;margin:16px 0}
+label{display:block;font-size:.85rem;margin:12px 0 5px}
+input,select,textarea{width:100%;background:#05070e;color:#fff;border:1px solid #38425f;border-radius:9px;padding:10px;font:inherit;min-height:40px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
+.tabs button{background:#070d26;color:var(--silver);border:1px solid #2c3d78;border-radius:999px;padding:8px 14px;cursor:pointer;font:600 .82rem system-ui,sans-serif}
+.tabs button.on{background:linear-gradient(100deg,#1d4fff,#00a8ff);color:#fff;border-color:transparent}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.78rem}
+tr.row{cursor:pointer}tr.row:hover{background:#0d1226}
+.st{font-size:.72rem;padding:3px 10px;border-radius:999px;background:var(--blue2);color:#cfdcff;white-space:nowrap}
+.st.approved,.st.active,.st.completed{background:#14452c;color:#9af0c0}.st.rejected,.st.defaulted{background:#5a1c1c;color:#ffb4b4}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.kv small{color:var(--muted);display:block}.kv b{color:#fff;font-weight:600;overflow-wrap:anywhere}
+.ids{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:10px}
+.ids img{width:100%;border-radius:10px;border:1px solid var(--line);background:#05070e}
+.err{color:#ff8f8f;min-height:1.3em;margin:8px 0 0;font-size:.85rem}
+.note{color:var(--muted);font-size:.8rem}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,30px);background:#101733;border:1px solid var(--blue);color:#fff;padding:11px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+.scroll{overflow-x:auto}
+.warn{border-color:#7a5a1f;background:#14100a}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+ <div><h1>STARLINK HYPERCORE FINANCE</h1><small>Staff portal. Authorised staff only. All actions are recorded.</small></div>
+ <div><span id="who" class="note"></span> <button class="btn ghost" id="out" hidden>Log out</button></div>
+</div></header>
+
+<main class="wrap">
+ <section id="login" class="panel" style="max-width:420px;margin:48px auto" hidden>
+  <h2>Staff login</h2>
+  <form id="lf">
+   <label for="le">Work email</label><input id="le" type="email" required autocomplete="username">
+   <label for="lp">Password</label><input id="lp" type="password" required autocomplete="current-password">
+   <p class="err" id="lerr" role="alert"></p>
+   <button class="btn gold" type="submit" id="lb">Log in</button>
+  </form>
+  <p class="note" style="margin-top:12px">Staff accounts are created by a system administrator. Customers cannot sign in here.</p>
+ </section>
+
+ <section id="denied" class="panel warn" hidden>
+  <h2>No staff access</h2>
+  <p>This account is not set up as staff, or its email is not verified. Ask your administrator to add you, then log in again.</p>
+ </section>
+
+ <section id="app" hidden>
+  <div class="tabs" id="tabs"></div>
+  <div class="panel scroll" id="listp">
+   <table><thead><tr><th>Applicant</th><th>Requested</th><th>Phone</th><th>Applied</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table>
+   <p class="note" id="empty" hidden>No applications in this view.</p>
+  </div>
+
+  <div class="panel" id="detail" hidden></div>
+  <div class="panel scroll" id="auditp" hidden>
+   <h3>Audit log (latest 150)</h3>
+   <table><thead><tr><th>When</th><th>Staff</th><th>Action</th><th>Application</th><th>Detail</th></tr></thead><tbody id="arows"></tbody></table>
+  </div>
+ </section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script type="module" src="admin.js"></script>
+</body>
+</html>
